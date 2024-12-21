@@ -2,6 +2,8 @@ import java.util.ArrayList;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+
+        /*
         Etat trois = new Etat(3, 10);
         Etat deux = new Etat(2, 10);
         Etat un = new Etat(1, 10);
@@ -13,25 +15,39 @@ public class Main {
         zero.transitions.add(new Transition(zero, "a"));
         zero.transitions.add(new Transition(zero, "b"));
 
-        Automate afn = new Automate(zero);
-        afn.ajoutEtat(zero);
-        afn.ajoutEtat(un);
-        afn.ajoutEtat(deux);
-        afn.ajoutEtat(trois);
+        Automate afn1 = new Automate(zero);
+        afn1.ajoutEtat(zero);
+        afn1.ajoutEtat(un);
+        afn1.ajoutEtat(deux);
+        afn1.ajoutEtat(trois);
 
-        System.out.println("\nAFN");
-        for (Integer i : Automate.etats.keySet()) {
+        System.out.println("\nafn1");
+        for (Integer i : afn1.etats.keySet()) {
             System.out.println(i);
         }
         System.out.println("");
+
         
-        Automate.conversionAfnAfd(zero, new ArrayList<>());
+        afn1.conversionAfnAfd(zero, new ArrayList<>());
          
-        for (Integer i : Automate.etats.keySet()) {
+        for (Integer i : afn1.etats.keySet()) {
             System.out.println("Etat : "+i);
-            for (Transition t : Automate.etats.get(i).transitions) {
+            for (Transition t : afn1.etats.get(i).transitions) {
                 System.out.println(t.symbole+", "+t.arrivEtat.exp);
             }
         }
+        */
+
+        Automate afn2 = LectureFichier.lireFichier("test.txt");
+        Automate afd = new Automate();
+        System.out.println("\nafn2");
+        afn2.affiche();
+
+        
+        afd.conversionAfnAfd(afn2.etats.get(1), afn2);
+
+        System.out.println("\nAFD :");
+        afd.affiche();
+        
     }
 }
