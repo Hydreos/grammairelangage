@@ -23,7 +23,7 @@ public class LectureFichier {
             e.printStackTrace();
         }
 
-        // Création des états
+        // Création des états, on convertit l'index des états en puissances de 2
         for (Integer numero : numeros) {
             etats.add(new Etat(numero, 10));
         }

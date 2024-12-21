@@ -4,6 +4,7 @@ import java.util.List;
 
 public class Automate {
 
+    // Les états des automates sont indexés par leur combinaison de puissances de 2
     HashMap<Integer, Etat> etats = new HashMap<>();
 
     void ajoutEtat(Etat e) {
@@ -16,7 +17,7 @@ public class Automate {
 
     void conversionAfnAfd(Etat e, Automate afn) {
 
-        // L'état courant est visité (pour eviter les boucles infinies)
+        // L'état courant est visité afin d'éviter les boucles infinies (visité = dans la liste des états du nouvel automate)
         ajoutEtat(e);
 
         // On liste les états qui constituent l'éventuel super-état courant
@@ -27,7 +28,6 @@ public class Automate {
 
         // On regroupe les transitions qui lisent le même symbole
         HashMap<String, ArrayList<Transition>> symbolesLus = new HashMap<>();
-
         for (Etat sousEtat : sousEtats) {
             for (Transition t : sousEtat.transitions) {
                 if (symbolesLus.containsKey(t.symbole)) {
@@ -39,7 +39,7 @@ public class Automate {
             }
         }
 
-        // On crée une liste qui contiendra les transitions analysées
+        // On crée une liste qui contiendra les nouvelles transitions
         ArrayList<Transition> temp_transitions = new ArrayList<>();
 
         // Pour chaque symbole, on crée si besoin un super-état qui est composé de
@@ -52,7 +52,7 @@ public class Automate {
             // Pour créer le numéro du super-état, on applique un OU bit à bit sur le numéro
             // des états qui le crée
             for (Transition t : transitions) {
-                somme = somme | afn.getEtat(t.arrivEtat).exp;
+                somme = somme | t.arrivEtat;
             }
 
             // Si l'état vers lequel on veut aller est déjà visité, on ne crée pas de nouvel
