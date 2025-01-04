@@ -10,6 +10,13 @@ public class Etat {
         if (base == 2) this.exp = n;
     }
 
+    Etat(Etat e) {
+        this.exp = e.exp;
+        for (Transition t : e.transitions) {
+            addTransition(t);
+        }
+    }
+
     void addTransition(Transition t) {
         transitions.add(t);
     }

@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Automate {
 
-    // Les états des automates sont indexés par leur combinaison de puissances de 2
+    // Les états sont indexés par leur combinaison de puissances de 2
     HashMap<Integer, Etat> etats = new HashMap<>();
 
     void ajoutEtat(Etat e) {
@@ -16,6 +16,8 @@ public class Automate {
     }
 
     void conversionAfnAfd(Etat e, Automate afn) {
+        // On copie l'état courant pour ne pas altérer l'original
+        e = new Etat(e);
 
         // L'état courant est visité afin d'éviter les boucles infinies (visité = dans la liste des états du nouvel automate)
         ajoutEtat(e);
