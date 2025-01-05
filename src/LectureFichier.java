@@ -3,12 +3,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
 
 public class LectureFichier {
 
     static Automate lireFichier(String nomFichier) {
-        List<Etat> etats = new ArrayList<>();
+        HashMap<Integer, Etat> etats = new HashMap<>();
 
         // Lecture du fichier pour savoir combien il y a d'états et leur numéro
         ArrayList<Integer> numeros = new ArrayList<>();
@@ -25,7 +25,7 @@ public class LectureFichier {
 
         // Création des états, on convertit l'index des états en puissances de 2
         for (Integer numero : numeros) {
-            etats.add(new Etat(numero, 10));
+            etats.put((int) Math.pow(2, numero), new Etat(numero, 10));
         }
 
         // Relecture du fichier pour remplir les états avec les transitions
@@ -38,12 +38,22 @@ public class LectureFichier {
                 // Format d'un état : numero transition transition transition ...
                 // Une ligne = un état
                 String[] transitions = ligne.split(" ");
+
+                // On récupère le numéro de l'état ainsi que l'état
+                int sourceNumero = (int) Math.pow(2, Integer.parseInt(transitions[0]));
+                Etat etatSource = etats.get(sourceNumero);
+
                 if (transitions.length > 1) {
                     for (String transition : Arrays.copyOfRange(transitions, 1, transitions.length)) {
+                        // Si on lit le mot final, l'état est final
+                        if (transition.equals("final")) {
+                            etatSource.etatFinal = true;
+                            break;
+                        }
+                        
                         // Format d'une transition : arrivEtat:symbole
                         String[] temp = transition.split(",");
-                        etats.get(Integer.parseInt(transitions[0])).transitions
-                                .add(new Transition(Integer.parseInt(temp[0]), 10, temp[1]));
+                        etatSource.transitions.add(new Transition(Integer.parseInt(temp[0]), 10, temp[1]));
                     }
                 }
             }
@@ -53,11 +63,11 @@ public class LectureFichier {
         }
 
         // Construction de l'automate
-        Automate afn = new Automate();
-        for (Etat etat : etats) {
-            afn.ajoutEtat(etat);
+        Automate automate = new Automate();
+        for (Integer index : etats.keySet()) {
+            automate.ajoutEtat(etats.get(index));
         }
 
-        return afn;
+        return automate;
     }
 }

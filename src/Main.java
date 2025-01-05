@@ -1,7 +1,7 @@
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        Automate afn = LectureFichier.lireFichier("test.txt");
+        Automate afn = LectureFichier.lireFichier("afn.txt");
         System.out.println("\nAFN");
         afn.affiche();
 

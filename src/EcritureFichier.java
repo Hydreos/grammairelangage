@@ -17,6 +17,9 @@ public class EcritureFichier {
                     bw.write(" " + transition.arrivEtat + "," + transition.symbole);
                 }
 
+                // Précise si l'état est final
+                if(etat.etatFinal) bw.write(" final");
+
                 // Passer à la ligne suivante
                 bw.newLine();
             }

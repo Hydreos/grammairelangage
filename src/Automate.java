@@ -19,7 +19,8 @@ public class Automate {
         // On copie l'état courant pour ne pas altérer l'original
         e = new Etat(e);
 
-        // L'état courant est visité afin d'éviter les boucles infinies (visité = dans la liste des états du nouvel automate)
+        // L'état courant est visité afin d'éviter les boucles infinies
+        // (visité = dans la liste des états du nouvel automate)
         ajoutEtat(e);
 
         // On liste les états qui constituent l'éventuel super-état courant
@@ -50,10 +51,12 @@ public class Automate {
 
             ArrayList<Transition> transitions = symbolesLus.get(symbole);
             int somme = 0;
+            boolean isFinal = false;
 
             // Pour créer le numéro du super-état, on applique un OU bit à bit sur le numéro
             // des états qui le crée
             for (Transition t : transitions) {
+                if(afn.etats.get(t.arrivEtat).etatFinal) isFinal = true;
                 somme = somme | t.arrivEtat;
             }
 
@@ -68,13 +71,18 @@ public class Automate {
             // nouvel état
             else {
                 Etat superEtat = new Etat(somme, 2);
-                temp_transitions.add(new Transition(somme,2, symbole));
+                superEtat.etatFinal = isFinal;
+                temp_transitions.add(new Transition(somme, 2, symbole));
                 conversionAfnAfd(superEtat, afn);
             }
         }
 
         // On ajoute les nouvelles transitions à l'état courant
         e.transitions = temp_transitions;
+    }
+
+    void minimisationAfd(Automate afd) {
+
     }
 
     static List<Integer> decomposerEnPuissancesDe2(int nombre) {
@@ -94,7 +102,10 @@ public class Automate {
 
     void affiche() {
         for (Integer i : etats.keySet()) {
-            System.out.println("Etat : " + i);
+            String stringFinal = "";
+            if (etats.get(i).etatFinal)
+                stringFinal = " final";
+            System.out.println("Etat" + stringFinal + " : " + i);
             for (Transition t : etats.get(i).transitions) {
                 System.out.println(t.symbole + ", " + t.arrivEtat);
             }
