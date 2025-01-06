@@ -7,8 +7,12 @@ public class Main {
 
         Automate afd = new Automate();
         afd.conversionAfnAfd(afn.etats.get(1), afn);
+        afd.remplirSymboles();
         System.out.println("\nAFD :");
         afd.affiche();
+
+        Automate afd2 = LectureFichier.lireFichier("afd2.txt");
+        Automate.minimisationAfd(afd2);
 
         EcritureFichier.ecrireAutomate("afd.txt", afd);
     }

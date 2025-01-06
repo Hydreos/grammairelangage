@@ -1,11 +1,14 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class Automate {
 
     // Les états sont indexés par leur combinaison de puissances de 2
     HashMap<Integer, Etat> etats = new HashMap<>();
+    List<String> symboles = new ArrayList<>();
 
     void ajoutEtat(Etat e) {
         etats.put(e.exp, e);
@@ -13,6 +16,16 @@ public class Automate {
 
     Etat getEtat(int i) {
         return etats.get(i);
+    }
+
+    // Remplissage de la liste des symboles de l'automate
+    void remplirSymboles() {
+        for (Etat etat : etats.values()) {
+            for (Transition transition : etat.transitions) {
+                if (!symboles.contains(transition.symbole))
+                    symboles.add(transition.symbole);
+            }
+        }
     }
 
     void conversionAfnAfd(Etat e, Automate afn) {
@@ -56,7 +69,8 @@ public class Automate {
             // Pour créer le numéro du super-état, on applique un OU bit à bit sur le numéro
             // des états qui le crée
             for (Transition t : transitions) {
-                if(afn.etats.get(t.arrivEtat).etatFinal) isFinal = true;
+                if (afn.etats.get(t.arrivEtat).etatFinal)
+                    isFinal = true;
                 somme = somme | t.arrivEtat;
             }
 
@@ -81,8 +95,77 @@ public class Automate {
         e.transitions = temp_transitions;
     }
 
-    void minimisationAfd(Automate afd) {
+    static void minimisationAfd(Automate afd) {
+        // Les états des couples sont stockés dans un HashMap
+        HashMap<Pair<Etat>, Boolean> couples = new HashMap<>();
 
+        // Toutes les combinaisons des états sont ajoutées au HashMap
+        for (Etat e1 : afd.etats.values()) {
+            for (Etat e2 : afd.etats.values()) {
+                // On veut exclusivement des couples d'état différents
+                if (e1.exp != e2.exp)
+                    // Les couples ne sont pas marqués à leur création
+                    couples.put(new Pair<Etat>(e1, e2), false);
+            }
+        }
+
+        // On cherche les états finaux de l'automate
+        List<Etat> etatsFinaux = new ArrayList<>();
+        for (Etat etat : afd.etats.values()) {
+            if (etat.etatFinal)
+                etatsFinaux.add(etat);
+        }
+
+        // On marque les premiers couples
+        for (Etat etatFinal : etatsFinaux) {
+            for (Etat etat : afd.etats.values()) {
+                if (etat.etatFinal)
+                    continue;
+                Pair<Etat> tempCouple = new Pair<Etat>(etatFinal, etat);
+                couples.put(tempCouple, true);
+            }
+        }
+
+        // Tant qu'on marque de nouveaux couples on parcourt chaque état non marqué
+        Boolean marque = true;
+        while (marque) {
+            marque = false;
+            for (Map.Entry<Pair<Etat>, Boolean> couple : couples.entrySet()) {
+                // Si le couple n'est pas marqué
+                if (couple.getValue() == false) {
+                    Etat e1 = couple.getKey().first;
+                    Etat e2 = couple.getKey().second;
+
+                    for (String symbole : afd.symboles) {
+                        // On cherche les transitions avec le symbole courant
+                        Optional<Transition> transition1 = e1.transitions.stream()
+                                .filter(transition -> transition.symbole.equals(symbole))
+                                .findFirst();
+                        // On récupère l'état d'arrivée de la transition
+                        int temp_e1_exp = transition1.get().arrivEtat;
+                        Etat temp_e1 = afd.etats.get(temp_e1_exp);
+
+                        // On cherche les transitions avec le symbole courant
+                        Optional<Transition> transition2 = e2.transitions.stream()
+                                .filter(transition -> transition.symbole.equals(symbole))
+                                .findFirst();
+                        // On récupère l'état d'arrivée de la transition
+                        int temp_e2_exp = transition2.get().arrivEtat;
+                        Etat temp_e2 = afd.etats.get(temp_e2_exp);
+
+                        // Si le couple d'arrivé est marqué, on marque le couple courant
+                        if (couples.containsKey(new Pair<Etat>(temp_e1, temp_e2))) {
+                            if (couples.get(new Pair<Etat>(temp_e1, temp_e2)) == true) {
+                                couples.put(couple.getKey(), true);
+                                marque = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println(couples);
     }
 
     static List<Integer> decomposerEnPuissancesDe2(int nombre) {
@@ -101,11 +184,19 @@ public class Automate {
     }
 
     void affiche() {
+        System.out.print("Symboles :");
+        for (String symbole : symboles) {
+            System.out.print(" " + symbole);
+        }
+
+        System.out.print("\n");
         for (Integer i : etats.keySet()) {
+
             String stringFinal = "";
             if (etats.get(i).etatFinal)
                 stringFinal = " final";
             System.out.println("Etat" + stringFinal + " : " + i);
+
             for (Transition t : etats.get(i).transitions) {
                 System.out.println(t.symbole + ", " + t.arrivEtat);
             }

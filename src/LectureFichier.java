@@ -68,6 +68,9 @@ public class LectureFichier {
             automate.ajoutEtat(etats.get(index));
         }
 
+        // Remplissage de la liste des symboles
+        automate.remplirSymboles();
+
         return automate;
     }
 }
