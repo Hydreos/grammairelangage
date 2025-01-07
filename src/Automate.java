@@ -31,7 +31,14 @@ public class Automate {
         }
     }
 
-    void conversionAfnAfd(Etat e, Automate afn) {
+    static Automate conversionAfnAfd(Etat initial, Automate afn) {
+        Automate afd = new Automate();
+        afd.conversionAfnAfd_recursion(initial, afn);
+        afd.remplirSymboles();
+        return afd;
+    }
+
+    void conversionAfnAfd_recursion(Etat e, Automate afn) {
         // On copie l'état courant pour ne pas altérer l'original
         e = new Etat(e);
 

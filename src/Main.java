@@ -3,9 +3,7 @@ public class Main {
 
         // AFN -> AFD
         Automate afn = LectureFichier.lireFichier("afn.txt");
-        Automate afd = new Automate();
-        afd.conversionAfnAfd(afn.etats.get(1), afn);
-        afd.remplirSymboles();
+        Automate afd = Automate.conversionAfnAfd(afn.etats.get(1), afn);
         EcritureFichier.ecrireAutomate("afd.txt", afd);
 
         // AFD -> AFD minimisé
