@@ -10,10 +10,10 @@ public class Main {
         afd.remplirSymboles();
         System.out.println("\nAFD :");
         afd.affiche();
+        EcritureFichier.ecrireAutomate("afd.txt", afd);
 
         Automate afd2 = LectureFichier.lireFichier("afd2.txt");
-        Automate.minimisationAfd(afd2);
-
-        EcritureFichier.ecrireAutomate("afd.txt", afd);
+        Automate afd2mini = Automate.minimisationAfd(afd2);
+        EcritureFichier.ecrireAutomate("afd2mini.txt", afd2mini);
     }
 }

@@ -1,8 +1,11 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 public class Automate {
 
@@ -95,7 +98,9 @@ public class Automate {
         e.transitions = temp_transitions;
     }
 
-    static void minimisationAfd(Automate afd) {
+    static Automate minimisationAfd(Automate afd) {
+        Automate afdMin = new Automate();
+
         // Les états des couples sont stockés dans un HashMap
         HashMap<Pair<Etat>, Boolean> couples = new HashMap<>();
 
@@ -165,7 +170,85 @@ public class Automate {
             }
         }
 
-        System.out.println(couples);
+        // Création des groupes d'états à fusionner
+        Map<Etat, Set<Etat>> groupes = new HashMap<>();
+
+        for (Map.Entry<Pair<Etat>, Boolean> couple : couples.entrySet()) {
+            if (!couple.getValue()) {
+                Etat e1 = couple.getKey().first;
+                Etat e2 = couple.getKey().second;
+
+                // Obtenir ou créer les groupes
+                Set<Etat> groupe1 = groupes.computeIfAbsent(e1, k -> new HashSet<>(Arrays.asList(e1)));
+                Set<Etat> groupe2 = groupes.computeIfAbsent(e2, k -> new HashSet<>(Arrays.asList(e2)));
+
+                // Fusionner les groupes
+                Set<Etat> groupeFusionne = new HashSet<>();
+                groupeFusionne.addAll(groupe1);
+                groupeFusionne.addAll(groupe2);
+
+                // Mettre à jour les références pour tous les états du groupe
+                for (Etat e : groupeFusionne) {
+                    groupes.put(e, groupeFusionne);
+                }
+            }
+        }
+
+        // Fusionner les états par groupe
+        Set<Set<Etat>> groupesUniques = new HashSet<>(groupes.values());
+        List<Etat> etatsFusionnes = new ArrayList<>();
+
+        for (Set<Etat> groupe : groupesUniques) {
+            // Créer le nouvel état fusionné
+            Etat etatFusionne = new Etat(0, 2);
+            boolean estFinal = false;
+
+            // Combiner les propriétés de tous les états du groupe
+            Map<String, Integer> transitionsParSymbole = new HashMap<>();
+            for (Etat e : groupe) {
+                etatFusionne.exp |= e.exp;
+                estFinal |= e.etatFinal;
+
+                // Regrouper les transitions par symbole et additionner les états d'arrivée
+                for (Transition t : e.transitions) {
+                    transitionsParSymbole.merge(t.symbole, t.arrivEtat, Integer::sum);
+                }
+            }
+
+            // Créer les nouvelles transitions fusionnées
+            for (Map.Entry<String, Integer> entry : transitionsParSymbole.entrySet()) {
+                etatFusionne.transitions.add(new Transition(entry.getValue(), 2, entry.getKey()));
+            }
+
+            etatFusionne.etatFinal = estFinal;
+            etatsFusionnes.add(etatFusionne);
+        }
+
+        // Après la boucle de fusion des états
+        afdMin.symboles = new ArrayList<>(afd.symboles);
+
+        // Ajouter les états fusionnés
+        for (Etat etatFusionne : etatsFusionnes) {
+            afdMin.etats.put(etatFusionne.exp, etatFusionne);
+        }
+
+        // Identifier et ajouter les états non fusionnés
+        Set<Etat> etatsInclusDansGroupes = new HashSet<>();
+        for (Set<Etat> groupe : groupesUniques) {
+            etatsInclusDansGroupes.addAll(groupe);
+        }
+
+        for (Etat etat : afd.etats.values()) {
+            if (!etatsInclusDansGroupes.contains(etat)) {
+                // Créer une copie de l'état
+                Etat nouvEtat = new Etat(etat.exp, 2);
+                nouvEtat.etatFinal = etat.etatFinal;
+                nouvEtat.transitions = new ArrayList<>(etat.transitions);
+                afdMin.etats.put(etat.exp, nouvEtat);
+            }
+        }
+
+        return afdMin;
     }
 
     static List<Integer> decomposerEnPuissancesDe2(int nombre) {
