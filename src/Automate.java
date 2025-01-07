@@ -97,7 +97,7 @@ public class Automate {
                 Etat superEtat = new Etat(somme, 2);
                 superEtat.etatFinal = isFinal;
                 temp_transitions.add(new Transition(somme, 2, symbole));
-                conversionAfnAfd(superEtat, afn);
+                conversionAfnAfd_recursion(superEtat, afn);
             }
         }
 
