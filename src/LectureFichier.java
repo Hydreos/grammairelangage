@@ -48,7 +48,13 @@ public class LectureFichier {
                         // Si on lit le mot final, l'état est final
                         if (transition.equals("final")) {
                             etatSource.etatFinal = true;
-                            break;
+                            continue;
+                        }
+
+                        // Si on lit le mot initial, l'état est initial
+                        if (transition.equals("initial")) {
+                            etatSource.etatInitial = true;
+                            continue;
                         }
                         
                         // Format d'une transition : arrivEtat:symbole

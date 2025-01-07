@@ -81,6 +81,7 @@ public class Automate {
             for (Transition t : transitions) {
                 if (afn.etats.get(t.arrivEtat).etatFinal)
                     isFinal = true;
+
                 somme = somme | t.arrivEtat;
             }
 
@@ -209,12 +210,14 @@ public class Automate {
             // Créer le nouvel état fusionné
             Etat etatFusionne = new Etat(0, 2);
             boolean estFinal = false;
+            boolean estInitial = false;
 
             // Combiner les propriétés de tous les états du groupe
             Map<String, Integer> transitionsParSymbole = new HashMap<>();
             for (Etat e : groupe) {
                 etatFusionne.exp |= e.exp;
                 estFinal |= e.etatFinal;
+                estInitial |= e.etatInitial;
 
                 // Regrouper les transitions par symbole et additionner les états d'arrivée
                 for (Transition t : e.transitions) {
@@ -228,6 +231,7 @@ public class Automate {
             }
 
             etatFusionne.etatFinal = estFinal;
+            etatFusionne.etatInitial = estInitial;
             etatsFusionnes.add(etatFusionne);
         }
 
@@ -248,9 +252,7 @@ public class Automate {
         for (Etat etat : afd.etats.values()) {
             if (!etatsInclusDansGroupes.contains(etat)) {
                 // Créer une copie de l'état
-                Etat nouvEtat = new Etat(etat.exp, 2);
-                nouvEtat.etatFinal = etat.etatFinal;
-                nouvEtat.transitions = new ArrayList<>(etat.transitions);
+                Etat nouvEtat = new Etat(etat);
                 afdMin.etats.put(etat.exp, nouvEtat);
             }
         }

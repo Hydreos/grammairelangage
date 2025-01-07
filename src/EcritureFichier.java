@@ -20,6 +20,9 @@ public class EcritureFichier {
                 // Précise si l'état est final
                 if(etat.etatFinal) bw.write(" final");
 
+                // Précise si l'état est initial
+                if(etat.etatInitial) bw.write(" initial");
+
                 // Passer à la ligne suivante
                 bw.newLine();
             }

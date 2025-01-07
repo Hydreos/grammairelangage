@@ -4,6 +4,7 @@ import java.util.List;
 public class Etat {
     public int exp;
     boolean etatFinal = false;
+    boolean etatInitial = false;
     List<Transition> transitions = new ArrayList<>();
 
     Etat(int n, int base) {
@@ -14,6 +15,7 @@ public class Etat {
     Etat(Etat e) {
         this.exp = e.exp;
         this.etatFinal = e.etatFinal;
+        this.etatInitial = e.etatInitial;
         for (Transition t : e.transitions) {
             addTransition(t);
         }
